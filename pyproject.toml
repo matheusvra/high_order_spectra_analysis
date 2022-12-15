@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "high-order-spectra-analysis"
+version = "0.1.0"
+description = "Package for high order spectra analysis using python"
+authors = ["Matheus Anjos <matheusvra@hotmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "high_order_spectra_analysis"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.23.5"
+scipy = "^1.9.3"
+matplotlib = "^3.6.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
