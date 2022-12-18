@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import time
 import progressbar
 
+
 def tds(
     signal: np.ndarray, 
     frequency_sampling: float, 
@@ -74,14 +75,18 @@ if __name__ == "__main__":
     time_step = 0.001
     fs = 1/time_step
     time = np.arange(0, 5, time_step)
-    f1 = 12
-    phi1 = np.pi*0.5
-    f2 = 53
-    phi2 = np.pi*0.5
-    f3 = 314
-    phi3 = np.pi*0.5
-    signal = np.cos(2*np.pi*f1*time + phi1) + np.cos(2*np.pi*f2*time + phi2) + np.cos(2*np.pi*f3*time + phi3)
-    
+
+    freqs = np.array([12, 53, 150, 314, 498])
+    phases = np.pi*np.array([0.5, 0.25, 1, 0, 3/4])
+
+    clean_signal = np.zeros(len(time))
+
+    for freq, phase in zip(freqs, phases):
+        clean_signal += np.cos(2*np.pi*freq*time + phase)
+
+    noise = np.random.normal(loc=0, scale=2.5*np.std(clean_signal), size=(len(time,)))
+
+    signal = clean_signal + noise
 
     frequency_array, amplitude, phase = tds(
         signal=signal,
@@ -97,8 +102,8 @@ if __name__ == "__main__":
     plt.plot(time, signal)
     plt.xlabel("Time [s]")
     plt.ylabel("Amplitude")
-    plt.savefig('time_domain_waveform2.png', format='png')
-    plt.savefig('time_domain_waveform2.eps', format='eps')
+    plt.savefig('time_domain_waveform3.png', format='png')
+    plt.savefig('time_domain_waveform3.eps', format='eps')
     plt.show()
 
     plt.figure(num=2, figsize=(14,12))
@@ -111,6 +116,6 @@ if __name__ == "__main__":
     plt.xlabel("Frequency [Hz]")
     plt.ylabel("Spectrum Phase")
     plt.yticks([0, np.pi, 2*np.pi], ["$0$", "$\\pi$", "$2\\pi$", ])
-    plt.savefig('time_domain_spectrum2.png', format='png')
-    plt.savefig('time_domain_spectrum2.eps', format='eps')
+    plt.savefig('time_domain_spectrum3.png', format='png')
+    plt.savefig('time_domain_spectrum3.eps', format='eps')
     plt.show()
