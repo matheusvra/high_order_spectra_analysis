@@ -28,15 +28,15 @@ def tds(
     """
 
     time_sampling = 1/frequency_sampling
-    time_end = len(signal)*time_sampling
+    time_end = len(signal)/time_sampling
 
     if time is None:
-        time = np.arange(0, time_end, time_sampling)[0:len(signal)]
+        time = np.linspace(0, time_end, len(signal))
 
     fmax = np.floor(frequency_sampling/2)-1 if fmax is None else fmax # Nyquist Frequency
     phase_len = np.floor(len(signal)*1/frequency_sampling)
-    fmin = 1/phase_len if fmin is None else fmin # Minimun test frequency at least one period 
-    
+    fmin = 1/phase_len if fmin is None else fmin #frequencia minima de teste - pelo menos um periodo no tempo;
+
     fstep = 0.01 if freq_step is None else fmin
     phistep = 0.01*np.pi if phase_step is None else phase_step
 
@@ -76,9 +76,9 @@ if __name__ == "__main__":
     time = np.arange(0, 5, time_step)
     f1 = 12
     phi1 = np.pi*0.5
-    f2 = 53
+    f2 = 19
     phi2 = np.pi*0.5
-    f3 = 314
+    f3 = 21
     phi3 = np.pi*0.5
     signal = np.cos(2*np.pi*f1*time + phi1) + np.cos(2*np.pi*f2*time + phi2) + np.cos(2*np.pi*f3*time + phi3)
     
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     frequency_array, amplitude, phase = tds(
         signal=signal,
         frequency_sampling=fs,
-        time=None,
+        time=time,
         fmin=None,
         fmax=None,
         freq_step=1,
@@ -97,8 +97,8 @@ if __name__ == "__main__":
     plt.plot(time, signal)
     plt.xlabel("Time [s]")
     plt.ylabel("Amplitude")
-    plt.savefig('time_domain_waveform2.png', format='png')
-    plt.savefig('time_domain_waveform2.eps', format='eps')
+    plt.savefig('time_domain_waveform.png', format='png')
+    plt.savefig('time_domain_waveform.eps', format='eps')
     plt.show()
 
     plt.figure(num=2, figsize=(14,12))
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     plt.xlabel("Frequency [Hz]")
     plt.ylabel("Spectrum Phase")
     plt.yticks([0, np.pi, 2*np.pi], ["$0$", "$\\pi$", "$2\\pi$", ])
-    plt.savefig('time_domain_spectrum2.png', format='png')
-    plt.savefig('time_domain_spectrum2.eps', format='eps')
+    plt.savefig('time_domain_spectrum.png', format='png')
+    plt.savefig('time_domain_spectrum.eps', format='eps')
     plt.show()
