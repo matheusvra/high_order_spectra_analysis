@@ -39,7 +39,7 @@ def tds(
     fmin = 1/phase_len if fmin is None else fmin # Minimun test frequency at least one period 
     
     fstep = 0.01 if freq_step is None else fmin
-    phistep = 0.01*np.pi if phase_step is None else phase_step
+    phistep = 0.01*2*np.pi if phase_step is None else phase_step
 
     frequency_array = np.arange(fmin, fmax, fstep)
     phi = np.arange(0, 2*np.pi, phistep)
@@ -76,17 +76,20 @@ if __name__ == "__main__":
     fs = 1/time_step
     time = np.arange(0, 5, time_step)
 
-    freqs = np.array([12, 53, 150, 314, 498])
-    phases = np.pi*np.array([0.5, 0.25, 1, 0, 3/4])
+    # freqs = np.array([12, 53, 150, 314, 498])
+    # phases = np.pi*np.array([0.5, 0.25, 1, 0, 3/4])
+    # gains = np.array([0.8, 0.7, 0.9, 1, 0.4])
 
-    clean_signal = np.zeros(len(time))
+    # clean_signal = np.zeros(len(time))
 
-    for freq, phase in zip(freqs, phases):
-        clean_signal += np.cos(2*np.pi*freq*time + phase)
+    # for freq, phase, gain in zip(freqs, phases, gains):
+    #     clean_signal += gain*np.cos(2*np.pi*freq*time + phase)
+
+    clean_signal = np.cos(2*np.pi*1e3*time) * np.cos(2*np.pi*53.71*time)
 
     noise = np.random.normal(loc=0, scale=2.5*np.std(clean_signal), size=(len(time,)))
 
-    signal = clean_signal + noise
+    signal = clean_signal #+ noise
 
     frequency_array, amplitude, phase = tds(
         signal=signal,
@@ -94,8 +97,8 @@ if __name__ == "__main__":
         time=None,
         fmin=None,
         fmax=None,
-        freq_step=1,
-        phase_step=1
+        freq_step=0.01,
+        phase_step=0.1
     )
 
     plt.figure(num=1, figsize=(14,12))
@@ -111,6 +114,10 @@ if __name__ == "__main__":
     plt.plot(frequency_array, amplitude)
     plt.xlabel("Frequency [Hz]")
     plt.ylabel("Spectrum Amplitude")
+    # for x, y in zip(freqs, gains):
+    #     plt.vlines(x, 0, 1.5, linestyles="dashed", linewidth=0.5, color='red')
+    #     plt.hlines(y, 0, 600, linestyles="dashed", linewidth=0.5, color='red')
+        
     plt.subplot(212)
     plt.plot(frequency_array, phase)
     plt.xlabel("Frequency [Hz]")
