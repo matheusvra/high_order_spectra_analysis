@@ -38,7 +38,7 @@ def tds(
     phase_len = np.floor(len(signal)*1/frequency_sampling)
     fmin = 1/phase_len if fmin is None else fmin # Minimun test frequency at least one period 
     
-    fstep = 0.01 if freq_step is None else fmin
+    fstep = 0.01 if freq_step is None else freq_step
     phistep = 0.01*2*np.pi if phase_step is None else phase_step
 
     frequency_array = np.arange(fmin, fmax, fstep)
