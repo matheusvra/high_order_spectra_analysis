@@ -55,16 +55,28 @@ def tds(
     bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi))
 
     counter = 0
+    step_counter = len(phi)
+
+    f = lambda phi, f, time, signal, S: np.mean(np.power(signal + np.cos(2*np.pi*f*time + phi), 2)) - np.mean(S) - 0.5
+
+    f_vectorized = np.vectorize(
+        f,
+        excluded=['f', 'time', 'signal', 'S']
+    )
+
     for i in range(len(frequency_array)):
-        for j in range(len(phi)):
-            x = signal + D*np.cos(2*np.pi*(frequency_array[i]*time) + phi[j])
-            aux[j] = np.mean(np.power(x, 2)) - np.mean(S) - 0.5;                
-            counter +=1 
-            if counter % 100 == 0:
-                bar.update(counter)
+        f_evaluated = f_vectorized(
+            phi=phi,
+            f=frequency_array[i],
+            time=time,
+            signal=signal,
+            S=S
+        )
+        counter += step_counter
+        bar.update(counter)
             
-        maximum_amplitude = np.max(aux)
-        index_max = np.argwhere(aux == maximum_amplitude)[0][0]
+        maximum_amplitude = np.max(f_evaluated)
+        index_max = np.argwhere(f_evaluated == maximum_amplitude).reshape(-1)[0]
         amplitude[i] = maximum_amplitude
         phase[i] = phi[index_max]
         
@@ -76,16 +88,15 @@ if __name__ == "__main__":
     fs = 1/time_step
     time = np.arange(0, 5, time_step)
 
-    # freqs = np.array([12, 53, 150, 314, 498])
-    # phases = np.pi*np.array([0.5, 0.25, 1, 0, 3/4])
-    # gains = np.array([0.8, 0.7, 0.9, 1, 0.4])
+    freqs = np.array([12, 53, 150, 314, 498])
+    phases = np.pi*np.array([0.5, 0.25, 1, 0, 3/4])
+    gains = np.array([0.8, 0.7, 0.9, 1, 0.4])
 
-    # clean_signal = np.zeros(len(time))
+    clean_signal = np.zeros(len(time))
 
-    # for freq, phase, gain in zip(freqs, phases, gains):
-    #     clean_signal += gain*np.cos(2*np.pi*freq*time + phase)
+    for freq, phase, gain in zip(freqs, phases, gains):
+        clean_signal += gain*np.cos(2*np.pi*freq*time + phase)
 
-    clean_signal = np.cos(2*np.pi*1e3*time) * np.cos(2*np.pi*53.71*time)
 
     noise = np.random.normal(loc=0, scale=2.5*np.std(clean_signal), size=(len(time,)))
 
@@ -97,7 +108,7 @@ if __name__ == "__main__":
         time=None,
         fmin=None,
         fmax=None,
-        freq_step=0.01,
+        freq_step=0.1,
         phase_step=0.1
     )
 
