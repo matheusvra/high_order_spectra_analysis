@@ -6,7 +6,7 @@ from high_order_spectra_analysis.time_domain_spectrum.tds import tds
 
 
 def load_data():
-    BASE_PATH = "behavior_experiment_spectrum/behavior_experiment_spectrum"
+    BASE_PATH = "behavior_experiment_spectrum"
     data = pd.read_csv(f"{BASE_PATH}/data_matrix.csv", delimiter=',', encoding="utf8")
     events_index = pd.read_csv(f"{BASE_PATH}/events_index.csv", delimiter=',', encoding="utf8")
     events_index_data_array = np.full((len(data),), None)
