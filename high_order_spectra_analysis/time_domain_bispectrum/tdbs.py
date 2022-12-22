@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import time
 import progressbar
 from high_order_spectra_analysis.time_domain_spectrum.tds import tds
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+# import gc
+
 
 def tdbs(
     signal: np.ndarray, 
@@ -13,7 +17,7 @@ def tdbs(
     freq_step: float = 1e-3,
     phase_step: float = 1e-3
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Time domain spectrum
+    """Time domain bispectrum
 
     Args:
         signal (np.ndarray): Signal which the spectrum will be calculated.
@@ -50,14 +54,21 @@ def tdbs(
     phase_bispectrum = np.zeros(len(frequency_array))
 
 
-    S = np.power(signal, 2)
+    S2 = np.power(signal, 2)
 
     bar = progressbar.ProgressBar(max_value=2*len(frequency_array)*len(phi))
-    counter_step = len(phi)
+    counter_step = 2*len(phi)
 
+    # f2 = mean(signal*(cos(pi*f*t + phi))^2))))
     f1 = np.vectorize(
         lambda phi, f, time, signal: np.mean(np.power(np.cos(np.pi*f*time * phi), 2) * signal),
         excluded = ['f', 'time', 'signal']
+    )
+
+    # f2 = mean(signal*(cos(2pi*f*t + phi))^2))))
+    f2 = np.vectorize(
+        lambda phi, f, time, S2: np.mean(np.cos(2*np.pi*f*time + phi) * S2),
+        excluded=['f', 'time', 'S2']
     )
 
     counter = 0
@@ -70,35 +81,30 @@ def tdbs(
             signal=signal
         )
 
-        counter += counter_step
-        bar.update(counter)
-            
         maximum_amplitude = np.max(evaluated_f1)
         index_max = np.argwhere(evaluated_f1 == maximum_amplitude).reshape(-1)[0]
+        # del evaluated_f1
+        # gc.collect()
         spectrum[i] = maximum_amplitude
         phase_spectrum[i] = phi[index_max]
 
-    f2 = np.vectorize(
-        lambda phi, f, time, S: np.mean(np.cos(2*np.pi*f*time*phi) * S),
-        excluded=['f', 'time', 'S']
-    )
-
-    for i in range(len(frequency_array)):
         evaluated_f2 = f2(
             phi=phi,
             f=frequency_array[i],
             time=time,
-            S=S
+            S2=S2
         )
+
+        maximum_amplitude = np.max(evaluated_f2)
+        index_max = np.argwhere(evaluated_f2 == maximum_amplitude).reshape(-1)[0]
+        # del evaluated_f2
+        # gc.collect()
+        bispectrum[i] = maximum_amplitude*spectrum[i]
+        phase_bispectrum[i] = phi[index_max]
 
         counter += counter_step
         bar.update(counter)
 
-        maximum_amplitude = np.max(evaluated_f2)
-        index_max = np.argwhere(evaluated_f2 == maximum_amplitude).reshape(-1)[0]
-        bispectrum[i] = maximum_amplitude*spectrum[i]
-        phase_bispectrum[i] = phi[index_max]
-        
     return frequency_array, spectrum, phase_spectrum, bispectrum, phase_bispectrum
 
 
@@ -129,42 +135,21 @@ if __name__ == "__main__":
         phase_step=0.1
     )
 
-    plt.figure(figsize=(14,12))
-    plt.plot(time, signal)
-    plt.xlabel("Time [s]")
-    plt.ylabel("Amplitude")
-    plt.savefig('time_domain_waveform3.png', format='png')
-    plt.savefig('time_domain_waveform3.eps', format='eps')
-    plt.show()
+    fig = make_subplots(rows=3, cols=1)
 
-    plt.figure(figsize=(14,12))
-    plt.subplot(211)
-    plt.plot(frequency_array, spectrum)
-    plt.xlabel("Frequency [Hz]")
-    plt.ylabel("Spectrum Amplitude")
+    fig.append_trace(go.Scatter(
+        x=time,
+        y=signal,
+    ), row=1, col=1)
 
-        
-    plt.subplot(212)
-    plt.plot(frequency_array, phase_spectrum)
-    plt.xlabel("Frequency [Hz]")
-    plt.ylabel("Spectrum Phase")
-    plt.yticks([0, np.pi, 2*np.pi], ["$0$", "$\\pi$", "$2\\pi$", ])
-    plt.savefig('time_domain_spectrum3.png', format='png')
-    plt.savefig('time_domain_spectrum3.eps', format='eps')
-    plt.show()
+    fig.append_trace(go.Scatter(
+        x=frequency_array,
+        y=bispectrum,
+    ), row=2, col=1)
 
-    plt.figure(figsize=(14,12))
-    plt.subplot(211)
-    plt.plot(frequency_array, bispectrum)
-    plt.xlabel("Frequency [Hz]")
-    plt.ylabel("Bispectrum Amplitude")
+    fig.append_trace(go.Scatter(
+        x=frequency_array,
+        y=phase_bispectrum,
+    ), row=3, col=1)
 
-        
-    plt.subplot(212)
-    plt.plot(frequency_array, phase_bispectrum)
-    plt.xlabel("Frequency [Hz]")
-    plt.ylabel("Bipectrum Phase")
-    plt.yticks([0, np.pi, 2*np.pi], ["$0$", "$\\pi$", "$2\\pi$", ])
-    plt.savefig('time_domain_spectrum3.png', format='png')
-    plt.savefig('time_domain_spectrum3.eps', format='eps')
-    plt.show()
+    fig.show()
