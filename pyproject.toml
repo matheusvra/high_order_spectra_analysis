@@ -15,6 +15,8 @@ matplotlib = "^3.6.2"
 progressbar2 = "^4.2.0"
 plotly = "^5.11.0"
 pandas = "^1.5.2"
+multiprocess = "^0.70.14"
+pathos = "^0.3.0"
 
 
 [build-system]
