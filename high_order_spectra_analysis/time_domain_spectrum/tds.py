@@ -3,6 +3,14 @@ import matplotlib.pyplot as plt
 import time
 import progressbar
 
+def f(phi, f, time, signal, mean_s_squared): 
+    x = signal + np.cos(2*np.pi*f*time + phi)
+    x = np.power(x, 2)
+    x = np.mean(x)
+    x = x - mean_s_squared
+    x = x - 0.5
+    return x
+    
 
 def tds(
     signal: np.ndarray, 
@@ -48,20 +56,19 @@ def tds(
     phase = np.zeros(len(frequency_array))
     aux = np.zeros(len(phi))
 
-    S = np.power(signal, 2)
 
-    D = 1
+    s_squared = np.power(signal, 2)
+    mean_s_squared = np.mean(s_squared)
+    
 
     bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi))
 
     counter = 0
     step_counter = len(phi)
 
-    f = lambda phi, f, time, signal, S: np.mean(np.power(signal + np.cos(2*np.pi*f*time + phi), 2)) - np.mean(S) - 0.5
-
     f_vectorized = np.vectorize(
         f,
-        excluded=['f', 'time', 'signal', 'S']
+        excluded=['f', 'time', 'signal', 'mean_s_squared']
     )
 
     for i in range(len(frequency_array)):
@@ -70,7 +77,7 @@ def tds(
             f=frequency_array[i],
             time=time,
             signal=signal,
-            S=S
+            mean_s_squared=mean_s_squared
         )
         counter += step_counter
         bar.update(counter)
@@ -116,8 +123,6 @@ if __name__ == "__main__":
     plt.plot(time, signal)
     plt.xlabel("Time [s]")
     plt.ylabel("Amplitude")
-    plt.savefig('time_domain_waveform3.png', format='png')
-    plt.savefig('time_domain_waveform3.eps', format='eps')
     plt.show()
 
     plt.figure(num=2, figsize=(14,12))
@@ -125,15 +130,11 @@ if __name__ == "__main__":
     plt.plot(frequency_array, amplitude)
     plt.xlabel("Frequency [Hz]")
     plt.ylabel("Spectrum Amplitude")
-    # for x, y in zip(freqs, gains):
-    #     plt.vlines(x, 0, 1.5, linestyles="dashed", linewidth=0.5, color='red')
-    #     plt.hlines(y, 0, 600, linestyles="dashed", linewidth=0.5, color='red')
+
         
     plt.subplot(212)
     plt.plot(frequency_array, phase)
     plt.xlabel("Frequency [Hz]")
     plt.ylabel("Spectrum Phase")
     plt.yticks([0, np.pi, 2*np.pi], ["$0$", "$\\pi$", "$2\\pi$", ])
-    plt.savefig('time_domain_spectrum3.png', format='png')
-    plt.savefig('time_domain_spectrum3.eps', format='eps')
     plt.show()

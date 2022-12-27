@@ -5,6 +5,14 @@ import progressbar
 from pathos.multiprocessing import ProcessingPool as Pool
 
 
+def f(phi, freq, time, signal, mean_s_squared): 
+    x = signal + np.cos(2*np.pi*freq*time + phi)
+    x = np.power(x, 2)
+    x = np.mean(x)
+    x = x - mean_s_squared
+    x = x - 0.5
+    return x
+
 def tds(
     signal: np.ndarray, 
     frequency_sampling: float, 
@@ -49,9 +57,9 @@ def tds(
     phase = np.zeros(len(frequency_array))
     aux = np.zeros(len(phi))
 
-    S = np.power(signal, 2)
+    s_squared = np.power(signal, 2)
+    mean_s_squared = np.mean(s_squared)
 
-    D = 1
 
     bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi))
 
@@ -62,8 +70,7 @@ def tds(
     for i, freq in enumerate(frequency_array):
 
         with Pool() as pool:
-            f_evaluated = pool.map(lambda x: np.mean(np.power(signal + np.cos(2*np.pi*freq*time + x), 2)) - np.mean(S) - 0.5
-, phi)
+            f_evaluated = pool.map(lambda x: f(x, freq, time, signal, mean_s_squared), phi)
         counter += step_counter
         bar.update(counter)
             
