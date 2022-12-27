@@ -17,6 +17,7 @@ plotly = "^5.11.0"
 pandas = "^1.5.2"
 multiprocess = "^0.70.14"
 pathos = "^0.3.0"
+debugpy = "^1.6.4"
 
 
 [build-system]

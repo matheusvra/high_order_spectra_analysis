@@ -5,7 +5,6 @@ import progressbar
 from high_order_spectra_analysis.time_domain_spectrum.tds import tds
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-# import gc
 
 
 def tdbs(
@@ -46,81 +45,78 @@ def tdbs(
     phistep = 0.01*2*np.pi if phase_step is None else phase_step
 
     frequency_array = np.arange(fmin, fmax, fstep)
-    phi = np.arange(0, 2*np.pi, phistep)
+    phi_array = np.arange(0, 2*np.pi, phistep)
 
-    spectrum = np.zeros(len(frequency_array))
     bispectrum = np.zeros(len(frequency_array))
-    phase_spectrum = np.zeros(len(frequency_array))
     phase_bispectrum = np.zeros(len(frequency_array))
+    spectrum = np.zeros(len(frequency_array))
+    phase_spectrum = np.zeros(len(frequency_array))
+    x = np.zeros(len(frequency_array))
 
-
-    S2 = np.power(signal, 2)
-
-    bar = progressbar.ProgressBar(max_value=2*len(frequency_array)*len(phi))
-    counter_step = 2*len(phi)
-
-    # f2 = mean(signal*(cos(pi*f*t + phi))^2))))
-    f1 = np.vectorize(
-        lambda phi, f, time, signal: np.mean(np.power(np.cos(np.pi*f*time * phi), 2) * signal),
-        excluded = ['f', 'time', 'signal']
-    )
-
-    # f2 = mean(signal*(cos(2pi*f*t + phi))^2))))
-    f2 = np.vectorize(
-        lambda phi, f, time, S2: np.mean(np.cos(2*np.pi*f*time + phi) * S2),
-        excluded=['f', 'time', 'S2']
-    )
+    bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi_array))
+    counter_step = len(phi_array)
 
     counter = 0
-    for i in range(len(frequency_array)):
+
+    for i, freq in enumerate(frequency_array):
+
+        max_a_l: float = float('-inf')
+        max_a_b: float = float('-inf')
+        max_a_b_write: float = float('-inf')
+        max_phi_l: float = -1.0
+        max_phi_b: float = -1.0
+
+        for phi in phi_array:
         
-        evaluated_f1 = f1(
-            phi=phi,
-            f=frequency_array[i],
-            time=time,
-            signal=signal
-        )
+            # x = P^2 for \Omega = \omega/2
+            x = np.cos(np.pi*freq*time + phi)**2
+            # x = SP^2
+            x = signal * x
+            # evaluated_x = mean(SP^2)
+            evaluated_l = np.mean(x)
 
-        maximum_amplitude = np.max(evaluated_f1)
-        index_max = np.argwhere(evaluated_f1 == maximum_amplitude).reshape(-1)[0]
-        # del evaluated_f1
-        # gc.collect()
-        spectrum[i] = maximum_amplitude
-        phase_spectrum[i] = phi[index_max]
+            update_max: bool = evaluated_l > max_a_l
+            max_a_l = evaluated_l if update_max else max_a_l
+            max_phi_l = phi if update_max else max_phi_l
 
-        evaluated_f2 = f2(
-            phi=phi,
-            f=frequency_array[i],
-            time=time,
-            S2=S2
-        )
+            # x = S^2
+            x = np.power(signal, 2)
+            # x = S^2P
+            x = x * np.cos(2*np.pi*freq*time + phi)
+            # evaluated_x = mean(S^2P)
+            evaluated_b = np.mean(x)
 
-        maximum_amplitude = np.max(evaluated_f2)
-        index_max = np.argwhere(evaluated_f2 == maximum_amplitude).reshape(-1)[0]
-        # del evaluated_f2
-        # gc.collect()
-        bispectrum[i] = maximum_amplitude*spectrum[i]
-        phase_bispectrum[i] = phi[index_max]
+            update_max: bool = evaluated_b > max_a_b
+            max_a_b = evaluated_b if update_max else max_a_b
+            max_a_b_write = evaluated_l*evaluated_b if update_max else max_a_b
+            max_phi_b = phi if update_max else max_phi_b
 
-        counter += counter_step
+        bispectrum[i] = max_a_b_write
+        phase_bispectrum[i] = max_phi_b
+        spectrum[i] = max_a_l
+        phase_spectrum[i] = max_phi_l
+
         bar.update(counter)
+        counter += counter_step
 
     return frequency_array, spectrum, phase_spectrum, bispectrum, phase_bispectrum
 
 
 if __name__ == "__main__":
-    time_step = 0.001
+    time_step = 0.003
     fs = 1/time_step
     time = np.arange(0, 5, time_step)
 
-    freqs = np.array([12, 53, 150, 314, 498])
-    phases = np.pi*np.array([0.5, 0.25, 1, 0, 3/4])
-    gains = np.array([0.8, 0.7, 0.9, 1, 0.4])
+    freqs = np.array([31, 40, 69])
+    w1, w3 = tuple(2*np.pi*np.array(freqs[::2]))
+    phases = np.pi*np.array([0.53, 1.14, 0.09])
+    phi1, phi3 = phases[0], phases[2]
+    gains = np.array([1.14, 0.92, 1.13])
 
     clean_signal = np.zeros(len(time))
 
     for freq, phase, gain in zip(freqs, phases, gains):
-        clean_signal += gain*np.cos(2*np.pi*freq*time + phase)
+        clean_signal += gain*np.cos(2*np.pi*freq*time + phase) + np.cos((w1 + w3)*time + (phi1 + phi3))
 
 
     signal = clean_signal 
@@ -144,12 +140,12 @@ if __name__ == "__main__":
 
     fig.append_trace(go.Scatter(
         x=frequency_array,
-        y=bispectrum,
+        y=spectrum,
     ), row=2, col=1)
 
     fig.append_trace(go.Scatter(
         x=frequency_array,
-        y=phase_bispectrum,
+        y=bispectrum,
     ), row=3, col=1)
 
     fig.show()
