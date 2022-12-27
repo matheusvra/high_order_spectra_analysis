@@ -102,10 +102,10 @@ if __name__ == "__main__":
     phi1, phi3 = phases[0], phases[2]
     gains = np.array([1.14, 0.92, 1.13])
 
-    clean_signal = np.zeros(len(time))
+    clean_signal = np.cos((w1 + w3)*time + (phi1 + phi3))
 
     for freq, phase, gain in zip(freqs, phases, gains):
-        clean_signal += gain*np.cos(2*np.pi*freq*time + phase) + np.cos((w1 + w3)*time + (phi1 + phi3))
+        clean_signal += gain*np.cos(2*np.pi*freq*time + phase) 
 
     signal = clean_signal 
 

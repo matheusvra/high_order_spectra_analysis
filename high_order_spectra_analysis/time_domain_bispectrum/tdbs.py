@@ -60,11 +60,10 @@ def tdbs(
 
     for i, freq in enumerate(frequency_array):
 
-        max_a_l: float = float('-inf')
-        max_a_b: float = float('-inf')
-        max_a_b_write: float = float('-inf')
-        max_phi_l: float = -1.0
-        max_phi_b: float = -1.0
+        max_amplitude_spectrum: float = float('-inf')
+        max_amplitude_bispectrum: float = float('-inf')
+        max_phi_spectrum: float = -1.0
+        max_phi_bispectrum: float = -1.0
 
         for phi in phi_array:
         
@@ -73,28 +72,29 @@ def tdbs(
             # x = SP^2
             x = signal * x
             # evaluated_x = mean(SP^2)
-            evaluated_l = np.mean(x)
+            evaluated_spectrum = np.mean(x)
 
-            update_max: bool = evaluated_l > max_a_l
-            max_a_l = evaluated_l if update_max else max_a_l
-            max_phi_l = phi if update_max else max_phi_l
+            update_max: bool = evaluated_spectrum > max_amplitude_spectrum
+            max_amplitude_spectrum = evaluated_spectrum if update_max else max_amplitude_spectrum
+            max_phi_spectrum = phi if update_max else max_phi_spectrum
 
             # x = S^2
             x = np.power(signal, 2)
             # x = S^2P
             x = x * np.cos(2*np.pi*freq*time + phi)
             # evaluated_x = mean(S^2P)
-            evaluated_b = np.mean(x)
+            evaluated_bispectrum = np.mean(x)
 
-            update_max: bool = evaluated_b > max_a_b
-            max_a_b = evaluated_b if update_max else max_a_b
-            max_a_b_write = evaluated_l*evaluated_b if update_max else max_a_b
-            max_phi_b = phi if update_max else max_phi_b
+            update_max: bool = evaluated_bispectrum > max_amplitude_bispectrum
 
-        bispectrum[i] = max_a_b_write
-        phase_bispectrum[i] = max_phi_b
-        spectrum[i] = max_a_l
-        phase_spectrum[i] = max_phi_l
+            max_amplitude_bispectrum = evaluated_bispectrum if update_max else max_amplitude_bispectrum
+            max_phi_bispectrum = phi if update_max else max_phi_bispectrum
+
+
+        bispectrum[i] = max_amplitude_bispectrum*max_amplitude_spectrum
+        phase_bispectrum[i] = max_phi_bispectrum
+        spectrum[i] = max_amplitude_spectrum
+        phase_spectrum[i] = max_phi_spectrum
 
         bar.update(counter)
         counter += counter_step
