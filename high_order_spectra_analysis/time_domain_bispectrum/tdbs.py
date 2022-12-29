@@ -14,7 +14,8 @@ def tdbs(
     fmin: float | None = None,
     fmax: float | None = None,
     freq_step: float = 1e-3,
-    phase_step: float = 1e-3
+    phase_step: float = 1e-3,
+    dtype: np.dtype = np.float64
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Time domain bispectrum
 
@@ -35,7 +36,7 @@ def tdbs(
     time_end = len(signal)*time_sampling
 
     if time is None:
-        time = np.arange(0, time_end, time_sampling)[0:len(signal)]
+        time = np.arange(0, time_end, time_sampling)[0:len(signal)].astype(dtype)
 
     fmax = np.floor(frequency_sampling/2)-1 if fmax is None else fmax # Nyquist Frequency
     phase_len = np.floor(len(signal)*1/frequency_sampling)
@@ -44,14 +45,14 @@ def tdbs(
     fstep = 0.01 if freq_step is None else freq_step
     phistep = 0.01*2*np.pi if phase_step is None else phase_step
 
-    frequency_array = np.arange(fmin, fmax, fstep)
-    phi_array = np.arange(0, 2*np.pi, phistep)
+    frequency_array = np.arange(fmin, fmax, fstep).astype(dtype)
+    phi_array = np.arange(0, 2*np.pi, phistep).astype(dtype)
 
-    bispectrum = np.zeros(len(frequency_array))
-    phase_bispectrum = np.zeros(len(frequency_array))
-    spectrum = np.zeros(len(frequency_array))
-    phase_spectrum = np.zeros(len(frequency_array))
-    x = np.zeros(len(frequency_array))
+    bispectrum = np.zeros(len(frequency_array)).astype(dtype)
+    phase_bispectrum = np.zeros(len(frequency_array)).astype(dtype)
+    spectrum = np.zeros(len(frequency_array)).astype(dtype)
+    phase_spectrum = np.zeros(len(frequency_array)).astype(dtype)
+    x = np.zeros(len(frequency_array)).astype(dtype)
 
     bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi_array))
     counter_step = len(phi_array)
@@ -60,10 +61,10 @@ def tdbs(
 
     for i, freq in enumerate(frequency_array):
 
-        max_amplitude_spectrum: float = float('-inf')
-        max_amplitude_bispectrum: float = float('-inf')
-        max_phi_spectrum: float = -1.0
-        max_phi_bispectrum: float = -1.0
+        max_amplitude_spectrum: dtype = dtype('-inf')
+        max_amplitude_bispectrum: dtype = dtype('-inf')
+        max_phi_spectrum: dtype = dtype(-1.0)
+        max_phi_bispectrum: dtype = dtype(-1.0)
 
         for phi in phi_array:
         
@@ -128,7 +129,8 @@ if __name__ == "__main__":
         fmin=None,
         fmax=None,
         freq_step=0.1,
-        phase_step=0.1
+        phase_step=0.1,
+        dtype=np.float32
     )
 
     fig = make_subplots(rows=3, cols=1)
