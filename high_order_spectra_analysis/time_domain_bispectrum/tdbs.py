@@ -16,7 +16,7 @@ def tdbs(
     freq_step: float = 1e-3,
     phase_step: float = 1e-3,
     dtype: np.dtype = np.float64
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Time domain bispectrum
 
     Args:
