@@ -1,8 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 import progressbar
-from high_order_spectra_analysis.time_domain_spectrum.tds import tds
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
@@ -15,7 +13,8 @@ def tdbs(
     fmax: float | None = None,
     freq_step: float = 1e-3,
     phase_step: float = 1e-3,
-    dtype: np.dtype = np.float64
+    dtype: np.dtype = np.float64,
+    enable_progress_bar: bool = True
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Time domain bispectrum
 
@@ -54,10 +53,11 @@ def tdbs(
     phase_spectrum = np.zeros(len(frequency_array)).astype(dtype)
     x = np.zeros(len(frequency_array)).astype(dtype)
 
-    bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi_array))
-    counter_step = len(phi_array)
+    if enable_progress_bar:
+        bar = progressbar.ProgressBar(max_value=len(frequency_array)*len(phi_array))
+        counter_step = len(phi_array)
 
-    counter = 0
+        counter = 0
 
     for i, freq in enumerate(frequency_array):
 
@@ -97,8 +97,9 @@ def tdbs(
         spectrum[i] = max_amplitude_spectrum
         phase_spectrum[i] = max_phi_spectrum
 
-        bar.update(counter)
-        counter += counter_step
+        if enable_progress_bar:
+            bar.update(counter)
+            counter += counter_step
 
     return frequency_array, spectrum, phase_spectrum, bispectrum, phase_bispectrum
 
@@ -130,7 +131,8 @@ if __name__ == "__main__":
         fmax=None,
         freq_step=0.1,
         phase_step=0.1,
-        dtype=np.float32
+        dtype=np.float32,
+        enable_progress_bar=False
     )
 
     fig = make_subplots(rows=3, cols=1)
