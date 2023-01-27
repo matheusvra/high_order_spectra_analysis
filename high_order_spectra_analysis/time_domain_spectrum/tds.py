@@ -1,16 +1,6 @@
 import numpy as np
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 import progressbar
 
-def f(phi, f, time, signal, mean_s_squared): 
-    x = signal + np.cos(2*np.pi*f*time + phi)
-    x = np.power(x, 2)
-    x = np.mean(x)
-    x = x - mean_s_squared
-    x = x - 0.5
-    return x
-    
 
 def tds(
     signal: np.ndarray, 
@@ -54,8 +44,6 @@ def tds(
 
     amplitude = np.zeros(len(frequency_array))
     phase = np.zeros(len(frequency_array))
-    aux = np.zeros(len(phi))
-
 
     s_squared = np.power(signal, 2)
     mean_s_squared = np.mean(s_squared)
@@ -65,6 +53,14 @@ def tds(
 
     counter = 0
     step_counter = len(phi)
+
+    def f(phi, f, time, signal, mean_s_squared): 
+        x = signal + np.cos(2*np.pi*f*time + phi)
+        x = np.power(x, 2)
+        x = np.mean(x)
+        x = x - mean_s_squared
+        x = x - 0.5
+        return x
 
     f_vectorized = np.vectorize(
         f,
@@ -88,52 +84,3 @@ def tds(
         phase[i] = phi[index_max]
         
     return frequency_array, amplitude, phase
-
-
-if __name__ == "__main__":
-
-    time_step = 0.003
-    fs = 1/time_step
-    time = np.arange(0, 5, time_step)
-
-    freqs = np.array([31, 40, 69])
-    w1, w3 = tuple(2*np.pi*np.array(freqs[::2]))
-    phases = np.pi*np.array([0.53, 1.14, 0.09])
-    phi1, phi3 = phases[0], phases[2]
-    gains = np.array([1.14, 0.92, 1.13])
-
-    clean_signal = np.cos((w1 + w3)*time + (phi1 + phi3))
-
-    for freq, phase, gain in zip(freqs, phases, gains):
-        clean_signal += gain*np.cos(2*np.pi*freq*time + phase) 
-
-    signal = clean_signal 
-
-    frequency_array, amplitude, phase = tds(
-        signal=signal,
-        frequency_sampling=fs,
-        time=None,
-        fmin=None,
-        fmax=None,
-        freq_step=0.1,
-        phase_step=0.1
-    )
-
-    fig = make_subplots(rows=3, cols=1)
-
-    fig.append_trace(go.Scatter(
-        x=time,
-        y=signal,
-    ), row=1, col=1)
-
-    fig.append_trace(go.Scatter(
-        x=frequency_array,
-        y=amplitude,
-    ), row=2, col=1)
-
-    fig.append_trace(go.Scatter(
-        x=frequency_array,
-        y=phase,
-    ), row=3, col=1)
-
-    fig.show()

@@ -1,8 +1,5 @@
 import numpy as np
-import time
 import progressbar
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 
 
 def tdbs(
@@ -91,7 +88,6 @@ def tdbs(
             max_amplitude_bispectrum = evaluated_bispectrum if update_max else max_amplitude_bispectrum
             max_phi_bispectrum = phi if update_max else max_phi_bispectrum
 
-
         bispectrum[i] = max_amplitude_bispectrum*max_amplitude_spectrum
         phase_bispectrum[i] = max_phi_bispectrum
         spectrum[i] = max_amplitude_spectrum
@@ -102,54 +98,3 @@ def tdbs(
             counter += counter_step
 
     return frequency_array, spectrum, phase_spectrum, bispectrum, phase_bispectrum
-
-
-if __name__ == "__main__":
-    time_step = 0.003
-    fs = 1/time_step
-    time = np.arange(0, 5, time_step)
-
-    freqs = np.array([31, 40, 69])
-    w1, w3 = tuple(2*np.pi*np.array(freqs[::2]))
-    phases = np.pi*np.array([0.53, 1.14, 0.09])
-    phi1, phi3 = phases[0], phases[2]
-    gains = np.array([1.14, 0.92, 1.13])
-
-    clean_signal = np.zeros(len(time))
-
-    for freq, phase, gain in zip(freqs, phases, gains):
-        clean_signal += gain*np.cos(2*np.pi*freq*time + phase) + np.cos((w1 + w3)*time + (phi1 + phi3))
-
-
-    signal = clean_signal 
-
-    frequency_array, spectrum, phase_spectrum, bispectrum, phase_bispectrum = tdbs(
-        signal=signal,
-        frequency_sampling=fs,
-        time=None,
-        fmin=None,
-        fmax=None,
-        freq_step=0.1,
-        phase_step=0.1,
-        dtype=np.float32,
-        enable_progress_bar=False
-    )
-
-    fig = make_subplots(rows=3, cols=1)
-
-    fig.append_trace(go.Scatter(
-        x=time,
-        y=signal,
-    ), row=1, col=1)
-
-    fig.append_trace(go.Scatter(
-        x=frequency_array,
-        y=spectrum,
-    ), row=2, col=1)
-
-    fig.append_trace(go.Scatter(
-        x=frequency_array,
-        y=bispectrum,
-    ), row=3, col=1)
-
-    fig.show()
