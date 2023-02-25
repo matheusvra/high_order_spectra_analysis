@@ -17,7 +17,7 @@ def tdbs(
     """Time domain bispectrum
 
     Args:
-        signal (np.ndarray): Signal which the spectrum will be calculated.
+        signal (np.ndarray): Signal which the bispectrum will be calculated.
         frequency_sampling (float): Frequency sampling of the signal.
         time (np.ndarray | None, optional): Time array (in case of already available, if nots, it is calculated). Defaults to None.
         frequency_array (np.ndarray | None, optional): Frequency array (in case of already available, if nots, it is calculated). Defaults to None.
@@ -27,7 +27,7 @@ def tdbs(
         phase_step (float, optional): Phase step to scan. Defaults to 0.001.
 
     Returns:
-        tuple[np.ndarray, np.ndarray, np.ndarray]: frequency array, amplitude array, phase array
+        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: frequency array, amplitude array, phase array
     """
 
     time_sampling = 1/frequency_sampling

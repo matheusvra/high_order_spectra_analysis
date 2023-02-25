@@ -13,11 +13,11 @@ def tdts(
     phase_step: float = 1e-3,
     dtype: np.dtype = np.float64,
     enable_progress_bar: bool = True
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Time domain trispectrum
 
     Args:
-        signal (np.ndarray): Signal which the spectrum will be calculated.
+        signal (np.ndarray): Signal which the trispectrum will be calculated.
         frequency_sampling (float): Frequency sampling of the signal.
         time (np.ndarray | None, optional): Time array (in case of already available, if nots, it is calculated). Defaults to None.
         frequency_array (np.ndarray | None, optional): Frequency array (in case of already available, if nots, it is calculated). Defaults to None.
@@ -27,7 +27,7 @@ def tdts(
         phase_step (float, optional): Phase step to scan. Defaults to 0.001.
 
     Returns:
-        tuple[np.ndarray, np.ndarray, np.ndarray]: frequency array, amplitude array, phase array
+        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: frequency array, amplitude array, phase array
     """
 
     time_sampling = 1/frequency_sampling
