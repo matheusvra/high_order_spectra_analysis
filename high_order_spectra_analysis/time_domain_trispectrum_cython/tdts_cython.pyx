@@ -31,19 +31,21 @@ def tdts(
         tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: frequency array, amplitude array, phase array
     """
 
-    cdef np.uint32_t N = signal.shape[0]
+    cdef np.ndarray phi_array = np.arange(0, 2*np.pi, phase_step, dtype="float32")
+    cdef int phase_length = phi_array.shape[0]
+    cdef int signal_length = signal.shape[0]
+    cdef int N = frequency_array.shape[0]
     cdef np.float32_t time_sampling = 1/frequency_sampling
-    cdef np.float32_t max_time = N*time_sampling
-    cdef np.ndarray time = np.linspace(0, max_time, N, dtype="float32_t")
-    cdef np.ndarray phi_array = np.arange(0, 2*np.pi, phase_step, dtype="float32_t")
-    cdef np.ndarray bispectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray phase_bispectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray spectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray phase_spectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray trispectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray phase_trispectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray squared_signal = np.power(signal, 2, dtype="float32_t")
-    cdef np.ndarray cubed_signal = np.power(signal, 3, dtype="float32_t")
+    cdef np.float32_t max_time = signal_length*time_sampling
+    cdef np.ndarray time = np.linspace(0, max_time, signal_length, dtype="float32")
+    cdef np.ndarray bispectrum = np.zeros(N, dtype="float32")
+    cdef np.ndarray phase_bispectrum = np.zeros(N, dtype="float32")
+    cdef np.ndarray spectrum = np.zeros(N, dtype="float32")
+    cdef np.ndarray phase_spectrum = np.zeros(N, dtype="float32")
+    cdef np.ndarray trispectrum = np.zeros(N, dtype="float32")
+    cdef np.ndarray phase_trispectrum = np.zeros(N, dtype="float32")
+    cdef np.ndarray squared_signal = np.power(signal, 2, dtype="float32")
+    cdef np.ndarray cubed_signal = np.power(signal, 3, dtype="float32")
     cdef np.float32_t max_amplitude_spectrum = -INFINITY
     cdef np.float32_t max_amplitude_bispectrum = -INFINITY
     cdef np.float32_t max_amplitude_trispectrum = -INFINITY
@@ -51,16 +53,16 @@ def tdts(
     cdef np.float32_t max_phi_bispectrum = -1
     cdef np.float32_t max_phi_trispectrum = -1
     cdef np.float32_t phi = 0
-    cdef np.ndarray P = np.zeros(N, dtype="float32_t") 
-    cdef np.ndarray SP =  np.zeros(N, dtype="float32_t")  
-    cdef np.float32_t evaluated_spectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray S2P = np.zeros(N, dtype="float32_t")
-    cdef np.float32_t evaluated_bispectrum = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray S3P = np.zeros(N, dtype="float32_t")
-    cdef np.ndarray evaluated_trispectrum = np.zeros(N, dtype="float32_t")
+    cdef np.ndarray P = np.zeros(signal_length, dtype="float32") 
+    cdef np.ndarray SP =  np.zeros(signal_length, dtype="float32")  
+    cdef np.float32_t evaluated_spectrum = 0
+    cdef np.ndarray S2P = np.zeros(signal_length, dtype="float32")
+    cdef np.float32_t evaluated_bispectrum = 0
+    cdef np.ndarray S3P = np.zeros(signal_length, dtype="float32")
+    cdef np.float32_t evaluated_trispectrum = 0
     cdef np.float32_t freq = 0
 
-    phase_length = phi_array.shape[0]
+    
 
     for i in range(N):
 
@@ -77,14 +79,14 @@ def tdts(
         
             phi = phi_array[j]
 
-            P = np.cos(2*np.pi*freq*time + phi, dtype="float32_t")
+            P = np.cos(2*np.pi*freq*time + phi, dtype="float32")
 
             # Spectrum
     
             # x = SP
-            SP =  np.multiply(signal, P, dtype="float32_t")
+            SP =  np.multiply(signal, P, dtype="float32")
             # evaluated_x = mean(SP^2)
-            evaluated_spectrum = np.mean(SP, dtype="float32_t")
+            evaluated_spectrum = np.mean(SP, dtype="float32")
 
             if evaluated_spectrum > max_amplitude_spectrum:
                 max_amplitude_spectrum = evaluated_spectrum
@@ -92,9 +94,9 @@ def tdts(
 
             # Bispectrum
             # x = S^2P
-            S2P = np.multiply(squared_signal, P, dtype="float32_t")
+            S2P = np.multiply(squared_signal, P, dtype="float32")
             # evaluated_x = mean(S^2P)
-            evaluated_bispectrum = np.mean(S2P, dtype="float32_t")
+            evaluated_bispectrum = np.mean(S2P, dtype="float32")
 
             if evaluated_bispectrum > max_amplitude_bispectrum:
                 max_amplitude_bispectrum = evaluated_bispectrum
@@ -103,9 +105,10 @@ def tdts(
 
             # Trispectrum
             # x = S^3P
-            S3P = np.multiply(cubed_signal, P, dtype="float32_t")
+            S3P = np.multiply(cubed_signal, P, dtype="float32")
+
             # evaluated_x = mean(S^3P)
-            evaluated_trispectrum = np.mean(S3P, dtype="float32_t")
+            evaluated_trispectrum = np.mean(S3P, dtype="float32")
 
             if evaluated_trispectrum > max_amplitude_trispectrum:
                 max_amplitude_trispectrum = evaluated_trispectrum
