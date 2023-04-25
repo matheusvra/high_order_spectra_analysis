@@ -2,7 +2,7 @@ import numpy as np
 import progressbar
 
 
-def tdt4s(
+def tdqs(
     signal: np.ndarray, 
     frequency_sampling: float, 
     time: np.ndarray | None = None,

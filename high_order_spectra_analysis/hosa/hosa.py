@@ -1,8 +1,9 @@
 import numpy as np
 from high_order_spectra_analysis.time_domain_spectrum.tds import tds
 from high_order_spectra_analysis.time_domain_bispectrum.tdbs import tdbs
-from high_order_spectra_analysis.time_domain_tetraspectrum.tdt4s import tdt4s
 from high_order_spectra_analysis.time_domain_trispectrum.tdts import tdts
+from high_order_spectra_analysis.time_domain_tetraspectrum.tdqs import tdqs
+
 
 class Tdhosa:
 
@@ -27,7 +28,7 @@ class Tdhosa:
         self.enable_progress_bar = enable_progress_bar
 
 
-    def run_tdspec(
+    def run_tds(
         self, 
         signal: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]: 
@@ -45,7 +46,7 @@ class Tdhosa:
         )
         
     
-    def run_td2spec(
+    def run_tdbs(
         self, 
         signal: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
@@ -63,7 +64,7 @@ class Tdhosa:
         )
         
     
-    def run_td3spec(
+    def run_tdts(
         self, 
         signal: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
@@ -80,12 +81,12 @@ class Tdhosa:
             enable_progress_bar=self.enable_progress_bar
         )
         
-    def run_td4spec(
+    def run_tdqs(
         self, 
         signal: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]: 
         
-        return tdt4s(
+        return tdqs(
             signal, 
             self.frequency_sampling, 
             frequency_array=self.frequency_array, 
