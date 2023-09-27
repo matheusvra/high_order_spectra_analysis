@@ -20,11 +20,8 @@ project which will import and use the Science Base Steel Shop package, and some 
 
 What things you need to have to be able to run:
 
-* Python 3.10+
-* Pip 3.10+
-* VirtualEnvWrapper is recommended but not mandatory
-* PyCharm IDE is ***highly recommended*** and will be approached in 
-the next section
+* Python 3.11+
+* Pip 3.11+
 
 ## Python 101
 
@@ -36,15 +33,6 @@ https://www.learnpython.org/
 ## Libs versioning
 
 All used libs are versioned in the file 'pyproject.toml', on the root of the project folder, with the Poetry.
-
-By using this setup, libs may be installed using the command (after repo configuration):
-
-```shell
-$ poetry install
-```
-
-Make sure that you are in the correct virtual environment when using
-this command.
 
 # IDE
 
