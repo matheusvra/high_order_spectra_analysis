@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: -high-order-spectral-analysis
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Matheus Victor Ramos
+    family-names: Anjos
+    email: matheusvra@ufmg.br
