@@ -1,55 +1,53 @@
-
 # Time Domain High Order Spectral Analysis
 
+This repository provides tools for performing **Time Domain High Order Spectral Analysis (TD-HOSA)**, a technique used to analyze non-linear and non-Gaussian signals by extending traditional spectral analysis beyond second-order statistics. This method is particularly useful in applications where standard Fourier-based techniques fall short, such as detecting system nonlinearities, identifying transient behaviors, and reducing Gaussian noise interference.
 
-This document will present a tutorial on how to configure your environment for the 
-first time, install dependencies, run the project main script, debugging and generation of the optimization results.
+## What is Time Domain High Order Spectral Analysis?
 
-----
+Traditional spectral analysis, such as Fourier or wavelet transforms, primarily focuses on second-order statistics (power spectra), which assume that the underlying process is linear and Gaussian. However, many real-world signals exhibit nonlinearity and non-Gaussian properties. **High Order Spectral Analysis (HOSA)** extends the analysis to higher-order statistics (such as bispectrum and trispectrum), which help reveal phase relationships and suppress Gaussian noise components.
 
-***Disclaimer***: This tutorial was made and tested on Ubuntu, if 
-you are not using a Linux distribution, some steps may need to be different.
+**Time Domain HOSA**, as opposed to frequency domain methods, directly analyzes signals in the time domain, allowing for a more detailed characterization of transient and nonlinear features.
 
+### Applications of TD-HOSA
 
-##  Important
+- **Industrial Process Monitoring:** Detecting anomalies and faults in mechanical and electrical systems.
+- **Biomedical Signal Processing:** Analysis of EEG and ECG signals to detect abnormal brain and heart activities.
+- **Structural Health Monitoring:** Identifying nonlinear vibrations in materials and infrastructures.
+- **Seismic Signal Analysis:** Understanding nonlinear interactions in geophysical data.
+- **Communication Systems:** Enhancing signal processing in non-Gaussian noise environments.
 
-This repository is meant to be used as package for steel shop optimization, meaning that the steps below are important to locally install and test, but ultimately, the configuration must be done in the mais 
-project which will import and use the Science Base Steel Shop package, and some steps may be different.  
+## Repository Context
 
-## Prerequisites
+This repository was designed to be used as a package for processing neural signals, meaning that the tools and analysis techniques implemented here aimed to identify complex signal patterns in neural electrophysiological data.&#x20;
 
-What things you need to have to be able to run:
+## Setup Guide
 
-* Python 3.11+
-* Pip 3.11+
+### Prerequisites
 
-## Python 101
+To run this repository, ensure you have the following installed:
 
-We do recommend
-Learn Python awesome interactive tutorials
+- Python 3.11+
+- Pip 3.11+
 
-https://www.learnpython.org/
+### Python 101
 
-## Libs versioning
+For those new to Python, we recommend the following interactive tutorials:
 
-All used libs are versioned in the file 'pyproject.toml', on the root of the project folder, with the Poetry.
+[Learn Python - Interactive Tutorials](https://www.learnpython.org/)
 
-# IDE
+### Library Versioning
 
-The default IDE used in this projetc is vscode.
+All library dependencies are managed and versioned in the `pyproject.toml` file using **Poetry**.
 
-# Setup 
+## IDE
 
-## Installing python 3.11+
+The recommended IDE for this project is **VS Code**.
 
-This quick tutorial is going to show you how to install the latest
-Python 3.11+ in Ubuntu.
+## Installation and Setup
 
-* Open terminal via Ctrl+Alt+T or searching for “Terminal” from 
-app launcher. 
-When it opens, run commands:
+### Installing Python 3.11+
 
-### Install Python 3.11+ on Ubuntu 20.04|18.04 using Apt Repo
+To install Python 3.11+ on Ubuntu, follow these steps:
 
 ```shell
 sudo apt install software-properties-common -y
@@ -57,82 +55,74 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt install python3.11
 ```
 
-Now you have at least one Python version installed, use ***python*** command for version 2.x (if still installed),
-***python3*** for the main version used in the OS, and ***python3.11*** for version 3.11.x.
+Verify the installation:
 
-To verify if it worked type
 ```shell
 python3.11 --version
 ```
-your output should look like:
 
-Python 3.11.7
+### Installing Pip
 
-## Installing pip
-
-Pip is a package management system used to install and 
-manage software packages written in Python. 
-Many packages can be found in it.
-
-It's recommended to install the latest version of pip3.10: 
-
-Install the latest with:
+Install the latest version of pip for Python 3.11:
 
 ```shell
 curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 ```
 
-and test result:
+Verify installation:
 
 ```shell
 python3.11 -m pip --version
 ```
 
-and then test upgrade
+Upgrade pip:
 
 ```shell
 python3.11 -m pip install --upgrade pip
 ```
 
-## Installing Poetry
+### Installing Poetry
 
-To install Poetry, the package used in this repository, just run the command after installation of Python3.11:
+Poetry is used for package and dependency management. Install it with:
 
 ```bash
-curl -sSL https://install.python-poetry.org | python3 -
+curl -sSL https://install.python-poetry.org | python3 - --version 1.8.3
 ```
 
-## Creating Virtual Environment
+### Creating a Virtual Environment
 
-First, if you want, you can set the path of the virtual environment to be created to be in the project folder, running the command:
+To create a virtual environment within the project directory:
 
 ```bash
 poetry config virtualenvs.in-project true
 ```
 
-To create the environment, you can explicitly determine the python version used, if the version choosed matches the restriction in pyproject.toml. If you want Poetry to create automatically, skip the next command, but if you want to create the environment explicitly, for example, to use python3.11, run:
+Explicitly create the environment using Python 3.11:
 
 ```bash
 poetry env use python3.11
 ```
 
-## Enabling Virtual Environment
+### Activating the Virtual Environment
 
-To enable (or create, if not already created) the virtual environment, just run the command:
+To activate (or create) the virtual environment:
 
 ```bash
 poetry shell
 ```
 
-After creating the virtual environment, you need to install the dependencies. This can be done with the command:
+### Installing Dependencies
+
+Once inside the virtual environment, install dependencies with:
 
 ```bash
 poetry install
 ```
 
-Now you're ready to run the project. If you are using the vscode, remember to set the interpreter to be the virtual environment created.
+If using **VS Code**, set the interpreter to the newly created virtual environment.
 
-More information about the Poetry usage can be found [HERE](https://python-poetry.org/docs)
+More details about Poetry can be found [HERE](https://python-poetry.org/docs).
 
 # Authors
- * **Matheus Anjos** - [matheusvra@hotmail.com](mailto:matheusvra@hotmail.com)
+
+- **Matheus Anjos** - [matheusvra@hotmail.com](mailto\:matheusvra@hotmail.com) - [https://github.com/matheusvra](https://github.com/matheusvra)
